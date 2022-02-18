@@ -44,6 +44,13 @@ pub struct GridPiece {
     sprite: SpriteBundle,
 }
 
+pub fn clear_grid(
+    mut grid: ResMut<Grid>
+) {
+    grid.0.clear();
+    println!("IWASHERWE");
+}
+
 pub fn grid_piece_startup_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,

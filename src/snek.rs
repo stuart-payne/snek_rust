@@ -18,6 +18,10 @@ pub fn set_snek_color(
     }
 }
 
+pub fn clear_snek(mut snek: ResMut<SnekQueue>) {
+    snek.0.clear();
+}
+
 pub fn init_snek(
     mut commands: Commands,
     grid: Res<grid::Grid>,

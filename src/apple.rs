@@ -9,6 +9,9 @@ pub struct SpawnApple(pub bool);
 
 pub fn spawn_apple(mut commands: Commands, query: Query<Entity, (With<GridItem>, Without<Snek>)>) {
     let grid_items = query.iter().map(|e| e).collect::<Vec<Entity>>();
+    if grid_items.len() == 0 {
+        return;
+    }
     commands.entity(grid_items[fastrand::usize(0..(grid_items.len() - 1) as usize)]).insert(Apple);
 }
 
