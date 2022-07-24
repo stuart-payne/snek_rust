@@ -1,25 +1,38 @@
 use crate::grid::Vec2Int;
-use crate::{grid, input, rand, constants, apple, events};
+use crate::{apple, constants, events, grid, input, rand};
 use bevy::prelude::*;
 use std::collections::VecDeque;
 
 #[derive(Component)]
 pub struct Snek;
+pub struct RunSnekReset(pub bool);
 pub struct SnekQueue(pub VecDeque<Entity>);
 pub struct SnekHead(pub Vec2Int);
 #[derive(Component)]
 pub struct Popped;
 
+pub fn set_snek_black(mut query: Query<&mut Sprite, (With<Snek>, Without<Popped>)>) {
+    set_snek_color(&mut query, Color::BLACK);
+}
+
 pub fn set_snek_color(
-    mut query: Query<&mut Sprite, (With<Snek>, Without<Popped>)>,
+    mut query: &mut Query<&mut Sprite, (With<Snek>, Without<Popped>)>,
+    color: Color,
 ) {
     for mut mat in query.iter_mut() {
-        mat.color = Color::BLACK;
+        mat.color = color;
     }
 }
 
-pub fn clear_snek(mut snek: ResMut<SnekQueue>) {
+pub fn clear_snek(
+    mut commands: Commands,
+    mut snek: ResMut<SnekQueue>,
+    mut query: Query<Entity, (With<Snek>, Without<Popped>)>,
+) {
     snek.0.clear();
+    for entity in query.iter() {
+        commands.entity(entity).remove::<Snek>();
+    }
 }
 
 pub fn init_snek(
@@ -27,8 +40,9 @@ pub fn init_snek(
     grid: Res<grid::Grid>,
     mut snek: ResMut<SnekQueue>,
     mut snek_head: ResMut<SnekHead>,
-    mut last_input: ResMut<input::LastInput>
+    mut current_input: ResMut<input::CurrentInput>,
 ) {
+    println!("SNEK_INIT");
     let x_len = grid.0.len();
     let y_len = grid.0[0].len();
     let starting_pos = rand::get_rand_coord(0..(x_len - 1) as i32, 0..(y_len - 1) as i32);
@@ -39,13 +53,13 @@ pub fn init_snek(
     snek.0.push_front(starting_piece);
 
     for num in 1..constants::SNEK_START_AMOUNT {
-        let new_pos = grid::get_wrapped_position(starting_pos,spawning_offset * num, &grid); 
+        let new_pos = grid::get_wrapped_position(starting_pos, spawning_offset * num, &grid);
         let ent = grid.0[new_pos.x as usize][new_pos.y as usize];
         commands.entity(ent).insert(Snek);
         snek.0.push_back(ent);
     }
     snek_head.0 = starting_pos;
-    last_input.0 = grid::get_opposite_direction(spawning_dir);
+    current_input.0 = grid::get_opposite_direction(spawning_dir);
 }
 
 pub fn clean_up_popped(
@@ -66,7 +80,7 @@ pub fn move_snek(
     mut snek: ResMut<SnekQueue>,
     mut snek_head: ResMut<SnekHead>,
     mut spawn_apple: ResMut<apple::SpawnApple>,
-    mut ev_gameover: EventWriter<events::Gameover>, 
+    mut ev_gameover: EventWriter<events::Gameover>,
     query: Query<Entity, With<apple::Apple>>,
 ) {
     let dir = grid::translate_direction(current_input.0);
@@ -86,7 +100,10 @@ pub fn move_snek(
 
     for entity in query.iter() {
         if new_snek_head == entity {
-            commands.entity(entity).remove::<apple::Apple>().insert(apple::Eaten);
+            commands
+                .entity(entity)
+                .remove::<apple::Apple>()
+                .insert(apple::Eaten);
             spawn_apple.0 = true;
         }
     }

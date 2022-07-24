@@ -1,6 +1,6 @@
+use crate::constants;
 use bevy::prelude::*;
 use std::ops::{Add, Mul};
-use crate::constants;
 
 #[derive(Component)]
 pub struct GridItem;
@@ -33,7 +33,10 @@ impl Mul<i32> for Vec2Int {
     type Output = Self;
 
     fn mul(self, rhs: i32) -> Self::Output {
-        Self { x: self.x * rhs, y: self.y * rhs}
+        Self {
+            x: self.x * rhs,
+            y: self.y * rhs,
+        }
     }
 }
 
@@ -44,11 +47,8 @@ pub struct GridPiece {
     sprite: SpriteBundle,
 }
 
-pub fn clear_grid(
-    mut grid: ResMut<Grid>
-) {
+pub fn clear_grid(mut grid: ResMut<Grid>) {
     grid.0.clear();
-    println!("IWASHERWE");
 }
 
 pub fn grid_piece_startup_system(
@@ -56,6 +56,7 @@ pub fn grid_piece_startup_system(
     asset_server: Res<AssetServer>,
     mut grid: ResMut<Grid>,
 ) {
+    println!("GRID INIT");
     let _scenes: Vec<HandleUntyped> = asset_server.load_folder("sprites/").unwrap();
 
     let mut x: i32 = 0;
@@ -96,7 +97,6 @@ pub fn grid_piece_startup_system(
     }
 }
 
-
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum Direction {
     Up,
@@ -120,7 +120,7 @@ pub fn get_opposite_direction(dir: Direction) -> Direction {
         Direction::Right => Direction::Left,
         Direction::Down => Direction::Up,
         Direction::Left => Direction::Right,
-    } 
+    }
 }
 
 pub fn get_wrapped_position(position: Vec2Int, dir_vec: Vec2Int, grid: &Res<Grid>) -> Vec2Int {
@@ -130,10 +130,9 @@ pub fn get_wrapped_position(position: Vec2Int, dir_vec: Vec2Int, grid: &Res<Grid
     new_pos
 }
 
-
 fn wrap(value: i32, min: i32, max: i32) -> i32 {
     if value < min {
-       return max - value.abs();
+        return max - value.abs();
     }
 
     if value >= max {
