@@ -1,5 +1,3 @@
-use bevy::ecs::event::Events;
-use bevy::ecs::schedule::ShouldRun;
 use bevy::prelude::*;
 use iyes_loopless::prelude::*;
 
@@ -12,6 +10,11 @@ mod input;
 mod rand;
 mod snek;
 mod state;
+
+// TODO: Add transition stages and events with new helper methods
+// TODO: Implement Gameover scene with transitions to it
+// TODO: Add Ui for gameover
+// TODO: Implement Main menu scene with transitions to it
 
 #[derive(Component)]
 struct Rock;
