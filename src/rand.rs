@@ -1,5 +1,5 @@
-use std::ops::Range;
 use crate::grid::{Direction, Vec2Int};
+use std::ops::Range;
 
 pub fn get_rand_direction() -> Direction {
     match fastrand::i32(0..3) {
@@ -12,5 +12,8 @@ pub fn get_rand_direction() -> Direction {
 }
 
 pub fn get_rand_coord(x_range: Range<i32>, y_range: Range<i32>) -> Vec2Int {
-    Vec2Int {x:fastrand::i32(x_range) , y: fastrand::i32(y_range)}
+    Vec2Int {
+        x: fastrand::i32(x_range),
+        y: fastrand::i32(y_range),
+    }
 }

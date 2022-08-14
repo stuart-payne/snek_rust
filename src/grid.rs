@@ -1,4 +1,4 @@
-use crate::constants;
+use crate::{apple, constants};
 use bevy::prelude::*;
 use std::ops::{Add, Mul};
 
@@ -47,8 +47,11 @@ pub struct GridPiece {
     sprite: SpriteBundle,
 }
 
-pub fn clear_grid(mut grid: ResMut<Grid>) {
-    grid.0.clear();
+pub fn clear_grid(mut commands: Commands, query: Query<Entity, With<GridItem>>) {
+    println!("I AM CLEARING INIT");
+    for entity in query.iter() {
+        commands.entity(entity).remove::<apple::Apple>();
+    }
 }
 
 pub fn grid_piece_startup_system(

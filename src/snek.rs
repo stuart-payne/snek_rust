@@ -15,24 +15,21 @@ pub fn set_snek_black(mut query: Query<&mut Sprite, (With<Snek>, Without<Popped>
     set_snek_color(&mut query, Color::BLACK);
 }
 
-pub fn set_snek_color(
-    mut query: &mut Query<&mut Sprite, (With<Snek>, Without<Popped>)>,
-    color: Color,
-) {
+pub fn set_snek_color(query: &mut Query<&mut Sprite, (With<Snek>, Without<Popped>)>, color: Color) {
     for mut mat in query.iter_mut() {
         mat.color = color;
     }
 }
 
-pub fn clear_snek(
-    mut commands: Commands,
-    mut snek: ResMut<SnekQueue>,
-    mut query: Query<Entity, (With<Snek>, Without<Popped>)>,
-) {
-    snek.0.clear();
-    for entity in query.iter() {
-        commands.entity(entity).remove::<Snek>();
+pub fn clear_snek(mut snek: ResMut<SnekQueue>, mut commands: Commands) {
+    let len = snek.0.len();
+    println!("snek_len: {:#?}", len);
+    let to_be_popped = snek.0.drain(0..len).collect::<VecDeque<_>>();
+    for ent in to_be_popped.iter() {
+        println!("LFGJKLFJDKLFJ");
+        commands.entity(*ent).insert(Popped);
     }
+    println!("snek_len_after: {:#?}", snek.0.len());
 }
 
 pub fn init_snek(
@@ -42,9 +39,11 @@ pub fn init_snek(
     mut snek_head: ResMut<SnekHead>,
     mut current_input: ResMut<input::CurrentInput>,
 ) {
-    println!("SNEK_INIT");
     let x_len = grid.0.len();
     let y_len = grid.0[0].len();
+    println!("x_len: {:#?}", x_len);
+    println!("y_len: {:#?}", y_len);
+    println!("snek_len: {:#?}", snek.0.len());
     let starting_pos = rand::get_rand_coord(0..(x_len - 1) as i32, 0..(y_len - 1) as i32);
     let starting_piece = grid.0[starting_pos.x as usize][starting_pos.y as usize];
     let spawning_dir = rand::get_rand_direction();
@@ -64,9 +63,9 @@ pub fn init_snek(
 
 pub fn clean_up_popped(
     mut commands: Commands,
-    mut query: Query<(Entity, &mut Sprite, With<Snek>, With<Popped>)>,
+    mut query: Query<(Entity, &mut Sprite, With<Popped>)>,
 ) {
-    for (entity, mut mat, _, _) in query.iter_mut() {
+    for (entity, mut mat, _) in query.iter_mut() {
         mat.color = Color::WHITE;
         commands.entity(entity).remove::<Snek>().remove::<Popped>();
     }

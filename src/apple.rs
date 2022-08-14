@@ -1,5 +1,5 @@
 use crate::{grid::GridItem, snek::Snek};
-use bevy::{ecs::schedule::ShouldRun, prelude::*};
+use bevy::prelude::*;
 
 #[derive(Component)]
 pub struct Apple;
@@ -8,10 +8,6 @@ pub struct Eaten;
 pub struct SpawnApple(pub bool);
 
 pub fn spawn_apple(mut commands: Commands, query: Query<Entity, (With<GridItem>, Without<Snek>)>) {
-    println!("I WAS ERe");
-    for entity in query.iter() {
-        println!("{:#?}", entity);
-    }
     let grid_items = query.iter().map(|e| e).collect::<Vec<Entity>>();
     if grid_items.len() == 0 {
         println!("EARLY EXIT");
@@ -22,13 +18,13 @@ pub fn spawn_apple(mut commands: Commands, query: Query<Entity, (With<GridItem>,
         .insert(Apple);
 }
 
-pub fn should_spawn_apple(mut spawn_apple: ResMut<SpawnApple>) -> ShouldRun {
+pub fn should_spawn_apple(mut spawn_apple: ResMut<SpawnApple>) -> bool {
     match spawn_apple.0 {
         true => {
             spawn_apple.0 = false;
-            ShouldRun::Yes
+            true
         }
-        false => ShouldRun::No,
+        false => false,
     }
 }
 
@@ -43,10 +39,9 @@ pub fn should_spawn_apple(mut spawn_apple: ResMut<SpawnApple>) -> ShouldRun {
 // }
 
 pub fn set_apple_color(mut query: Query<&mut Sprite, With<Apple>>) {
-    for sprite in query.iter() {
-        println!("{:#?}", sprite)
-    }
     for mut mat in query.iter_mut() {
-        mat.color = Color::GREEN;
+        if mat.color != Color::GREEN {
+            mat.color = Color::GREEN;
+        }
     }
 }
