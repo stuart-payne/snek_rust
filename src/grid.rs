@@ -47,13 +47,6 @@ pub struct GridPiece {
     sprite: SpriteBundle,
 }
 
-pub fn clear_grid(mut commands: Commands, query: Query<Entity, With<GridItem>>) {
-    println!("I AM CLEARING INIT");
-    for entity in query.iter() {
-        commands.entity(entity).remove::<apple::Apple>();
-    }
-}
-
 pub fn grid_piece_startup_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -100,6 +93,16 @@ pub fn grid_piece_startup_system(
     }
 }
 
+pub fn despawn_grid(mut commands: Commands,mut grid: ResMut<Grid>, query: Query<Entity, With<GridItem>>,) {
+    let len = grid.0.len();
+    for mut row in grid.0.drain(0..len) {
+        row.drain(0..row.len());
+    }
+    for e in query.iter() {
+        commands.entity(e).despawn();
+    }
+}
+
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum Direction {
     Up,
@@ -143,3 +146,4 @@ fn wrap(value: i32, min: i32, max: i32) -> i32 {
     }
     value
 }
+

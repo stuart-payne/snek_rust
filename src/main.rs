@@ -5,6 +5,7 @@ mod apple;
 mod constants;
 mod events;
 mod game_scene;
+mod gameover_scene; 
 mod grid;
 mod input;
 mod rand;
@@ -26,8 +27,9 @@ fn camera_setup(mut commands: Commands) {
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_plugin(game_scene::GameScene)
         .add_loopless_state(state::GameState::Game)
+        .add_plugin(game_scene::GameScene)
+        .add_plugin(gameover_scene::GameoverScene)
         .insert_resource(input::InputMaps(Vec::new()))
         .add_startup_system(input::init_input)
         .add_startup_system(camera_setup)
